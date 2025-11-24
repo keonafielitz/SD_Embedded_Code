@@ -18,10 +18,15 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
+#include "i2s.h"
+#include "usart.h"
+#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -42,6 +47,16 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+//uint8_t TxBuffer[] = "Hello World! From STM32 USB CDC Device To Virtual COM Port\r\n";
+//uint8_t TxBufferLen = sizeof(TxBuffer);
+//uint8_t ret;
+
+//sample buffer
+int16_t data_i2s[100];
+volatile int16_t sample_i2s;
+
+
 
 /* USER CODE END PV */
 
@@ -84,7 +99,13 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_USART2_UART_Init();
+  MX_I2S2_Init();
   /* USER CODE BEGIN 2 */
+
+  HAL_I2S_Receive_DMA(&hi2s2, (uint16_t*) data_i2s, sizeof(data_i2s)/2);
 
   /* USER CODE END 2 */
 
@@ -95,6 +116,33 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+//	  ret = HAL_RCC_GetSysClockFreq();
+//	  printf("Hello World \n");
+//	  HAL_Delay(1000);
+
+//	  if (hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED)
+//	  {
+//	      //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 0); // LED ON
+//	  }
+//	  else
+//	  {
+//	      //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 1); // LED OFF
+//	  }
+//
+//	  ret = CDC_Transmit_FS((uint8_t*)"test\r\n", 6);
+//	  HAL_Delay(10);
+//
+////	  char msg[] = "Ping\r\n";
+////	  __NOP();   // breakpoint here
+////	  ret = CDC_Transmit_FS((uint8_t*)msg, strlen(msg));
+////
+////	  if (ret == USBD_OK) {
+////	      __NOP();  // breakpoint here
+////	  } else {
+////	      __NOP();  // breakpoint here
+////	  }
+////	  CDC_Transmit_FS((uint8_t*)TxBuffer, TxBufferLen);
+////	  HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
@@ -116,10 +164,14 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 100;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 3;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -129,18 +181,33 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
   {
     Error_Handler();
   }
 }
 
 /* USER CODE BEGIN 4 */
+
+int _write(int file, char *ptr, int len){
+	int DataIdx;
+
+	for(DataIdx = 0; DataIdx < len; DataIdx++){
+		ITM_SendChar(*ptr++);
+	}
+	return len;
+}
+
+void HAL_I2S_RxCpltCallback(I2S_HandleTypeDef *hi2s){
+
+	sample_i2s = data_i2s[1];
+}
+
 
 /* USER CODE END 4 */
 
@@ -158,8 +225,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
