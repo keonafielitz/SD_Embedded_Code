@@ -1,6 +1,7 @@
 ../Drivers/CMSIS/Include/core_cm4.h:2064:26:ITM_SendChar	4
-../Core/Src/main.c:78:5:main	1
-../Core/Src/main.c:154:6:SystemClock_Config	3
-../Core/Src/main.c:197:5:_write	2
-../Core/Src/main.c:206:6:HAL_I2S_RxCpltCallback	1
-../Core/Src/main.c:218:6:Error_Handler	1
+../Core/Src/main.c:111:5:main	12
+../Core/Src/main.c:329:6:SystemClock_Config	3
+../Core/Src/main.c:372:5:_write	2
+../Core/Src/main.c:381:6:HAL_I2S_RxCpltCallback	1
+../Core/Src/main.c:415:6:print_fresult	21
+../Core/Src/main.c:448:6:Error_Handler	1

@@ -1,6 +1,7 @@
 ../Drivers/CMSIS/Include/core_cm4.h:2064:26:ITM_SendChar	16	static,ignoring_inline_asm
-../Core/Src/main.c:78:5:main	8	static
-../Core/Src/main.c:154:6:SystemClock_Config	88	static
-../Core/Src/main.c:197:5:_write	32	static
-../Core/Src/main.c:206:6:HAL_I2S_RxCpltCallback	16	static
-../Core/Src/main.c:218:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:111:5:main	40	static
+../Core/Src/main.c:329:6:SystemClock_Config	88	static
+../Core/Src/main.c:372:5:_write	32	static
+../Core/Src/main.c:381:6:HAL_I2S_RxCpltCallback	16	static
+../Core/Src/main.c:415:6:print_fresult	16	static
+../Core/Src/main.c:448:6:Error_Handler	4	static,ignoring_inline_asm
