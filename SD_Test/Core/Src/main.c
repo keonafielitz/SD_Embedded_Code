@@ -167,15 +167,15 @@ int main(void)
 //    f_close(&SDFile);
 
     GPIO_PinState pin_state = HAL_GPIO_ReadPin(GPIOC, Detect_Pin);
-    GPIO_PinState pin_stat1e = HAL_GPIO_ReadPin(GPIOD, SDIO_CMD_Pin);
-    GPIO_PinState pin_state2 = HAL_GPIO_ReadPin(GPIOC, SDIO_DO_Pin);
+//    GPIO_PinState pin_stat1e = HAL_GPIO_ReadPin(GPIOD, SDIO_CMD_Pin);
+//    GPIO_PinState pin_state2 = HAL_GPIO_ReadPin(GPIOC, SDIO_DO_Pin);
 
 
       printf("SD Card Information");
       res = f_mount(&SDFatFS, SDPath, 1);
       if (res != FR_OK) {
               printf("Unable to mount disk\n");
-              Error_Handler();
+              //Error_Handler();
       }
 
       HAL_Delay(20);
@@ -188,7 +188,7 @@ int main(void)
               f_close(&SDFile);
           } else {
               printf("Unable to read\n");
-              Error_Handler();
+              //Error_Handler();
           }
       } else {
           // File did not exist - let's create it
@@ -199,12 +199,12 @@ int main(void)
                   f_close(&SDFile);
               } else {
                   printf("Unable to write\n");
-                  Error_Handler();
+                  //Error_Handler();
               }
           } else {
         	  FRESULT fr = f_open(&SDFile, total_uptime_filename, FA_CREATE_ALWAYS | FA_WRITE);
               printf("Unable to create\n");
-              Error_Handler();
+              //Error_Handler();
           }
       }
 
